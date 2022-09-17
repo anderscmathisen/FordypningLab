@@ -60,6 +60,8 @@ class Hand:
         self,
         top,
         layer,
+        layer_box,
+        enclosing_box_fraction,
         start_pos: Point,
         finger_width: int,
         finger_pitch: int,
@@ -69,6 +71,8 @@ class Hand:
     ) -> None:
         self.top = top
         self.layer = layer
+        self.layer_box = layer_box
+        self.enclosing_box_fraction = enclosing_box_fraction
         self.start_pos: Point = start_pos
         self.finger_width: int = finger_width
         self.finger_pitch: int = finger_pitch
@@ -112,6 +116,12 @@ class Hand:
         """Method that draws the entire LED hand"""
         self.draw_base()
         self.draw_fingers()
+        self.draw_enclosing_box()
+        
+    def draw_enclosing_box(self):
+    
+        self.top.shapes(self.layer_box).insert(
+          MyBox(self.start_pos.offset(-self.enclosing_box_fraction/2*self.width,-self.enclosing_box_fraction/2*self.height), self.width*(1+self.enclosing_box_fraction),self.height*(1+self.enclosing_box_fraction)))
 
 
 if __name__ == "__main__":
@@ -119,20 +129,23 @@ if __name__ == "__main__":
     layout = pya.Layout()
 
     top = layout.create_cell("TOP")
-    layer = layout.layer(1, 0)
+    layer = layout.layer(0, 0)
+    layer_box = layout.layer(2, 0)
 
     scale = 1000
 
     LED_widht = 1000 * scale  # microns
     LED_heigth = 1000 * scale  # microns
 
-    LED_spacing_x = 600 * scale  # microns
-    LED_spacing_y = 1200 * scale  # microns
+    LED_spacing_x = 5000 * scale  # microns
+    LED_spacing_y = 5000 * scale  # microns
 
     finger_widths = np.array([4, 4.5, 5, 5.5]) * scale  # microns
-    finger_pitches = np.array([50, 100, 150, 200]) * scale  # microns
+    finger_pitches = np.array([50, 100, 150, 220]) * scale  # microns
 
     startpos = Point(0, 0)
+    
+    enclosing_box_fraction = 0.6
 
     for x in range(4):
         for y in range(4):
@@ -147,6 +160,8 @@ if __name__ == "__main__":
             single_hand = Hand(
                 top,
                 layer,
+                layer_box,
+                enclosing_box_fraction,
                 hand_point,
                 finger_width,
                 finger_pitch,
