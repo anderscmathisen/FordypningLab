@@ -21,6 +21,9 @@ class Point:
         """returns a new point offset by dx in x direction and dy in y direction"""
         return Point(self.x + dx, self.y + dy)
 
+    def __iter__(self):
+        return iter((self.x, self.y))
+
 
 class MyBox(pya.Box):
     """Class that wraps pya.Box so that it accepts a point reprecenting lower left corner, and a width and height"""
@@ -119,24 +122,33 @@ class Hand:
         self.draw_fingers()
         self.draw_enclosing_box()
         self.draw_Info()
+
     def __str__(self):
         return f"Finger width: {self.finger_width/self.scale}\nFinger Pitch: {self.finger_pitch//self.scale}"
+
     def draw_Info(self):
         gen = pya.TextGenerator.default_generator()
         w = self.finger_width
         p = self.finger_pitch
-    #gen.default_generator()
-        region = gen.text(str (self), gen.dbu(),100//2)
-        pos = self.start_pos.offset_y(int(self.height*1.2))
-        t = pya.Trans(pos.x, pos.y)
+
+        region = gen.text(str(self), gen.dbu(), 100 // 2)
+        pos = self.start_pos.offset_y(int(self.height * 1.2))
+        t = pya.Trans(*pos)
         region.transform(t)
         self.top.shapes(self.layer).insert(region)
-        
-    
+
     def draw_enclosing_box(self):
-    
+
         self.top.shapes(self.layer_box).insert(
-          MyBox(self.start_pos.offset(-self.enclosing_box_fraction/2*self.width,-self.enclosing_box_fraction/2*self.height), self.width*(1+self.enclosing_box_fraction),self.height*(1+self.enclosing_box_fraction)))
+            MyBox(
+                self.start_pos.offset(
+                    -self.enclosing_box_fraction / 2 * self.width,
+                    -self.enclosing_box_fraction / 2 * self.height,
+                ),
+                self.width * (1 + self.enclosing_box_fraction),
+                self.height * (1 + self.enclosing_box_fraction),
+            )
+        )
 
 
 if __name__ == "__main__":
@@ -145,7 +157,7 @@ if __name__ == "__main__":
 
     top = layout.create_cell("TOP")
     layer = layout.layer(0, 0)
-    layer_txt = layout.layer(1,0)
+    layer_txt = layout.layer(1, 0)
     layer_box = layout.layer(2, 0)
 
     scale = 1000
@@ -157,22 +169,19 @@ if __name__ == "__main__":
     LED_spacing_y = 5000 * scale  # microns
 
     finger_widths = np.array([4, 4.5, 5, 5.5]) * scale  # microns
-    finger_pitches = np.array([50, 100, 150, 220]) * scale  # microns
+    finger_pitches = np.array([50, 100, 150, 200]) * scale  # microns
 
     startpos = Point(0, 0)
-    
+
     enclosing_box_fraction = 0.6
-    
+
     for x in range(4):
         for y in range(4):
 
             hand_point = startpos.offset(
                 x * (LED_widht + LED_spacing_x), y * (LED_heigth + LED_spacing_y)
             )
-            
 
-          
-            
             finger_width = finger_widths[y]
             finger_pitch = finger_pitches[x]
 
@@ -192,5 +201,5 @@ if __name__ == "__main__":
             single_hand.draw()
 
     layout.write(
-        r"C:\Users\krist\OneDrive - NTNU\Semestre\09 - 2022 Høst\TFY4245 - Faststoff-fysikk, videregående kurs\Lab\MedAnders\FordypningLab\LED_Design.gds"
+        "/Users/anders/Documents/Skole/5.host/Lab/FordypningLab/LED_Design.gds"
     )
