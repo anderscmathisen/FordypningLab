@@ -71,7 +71,7 @@ class Hand:
         width: int,
         height: int,
         scale: int,
-        layer_etch = None,
+        layer_etch=None,
     ) -> None:
         self.top = top
         self.layer = layer
@@ -86,7 +86,6 @@ class Hand:
         self.vertical_bus_width: int = 30 * scale
         self.horizontal_bus_height: int = 50 * scale
         self.scale = scale
-        
 
     def draw_base(self, etchmask=False):
         """Draws the base horizontal bus bar and vertical bussbar with parameters that are fixed in __init__"""
@@ -94,19 +93,22 @@ class Hand:
         if etchmask:
             offset_etchmask = 2.4 * self.scale
             self.top.shapes(self.layer_etch).insert(
-            MyBox(
-                self.start_pos.offset(-offset_etchmask, -offset_etchmask),
-                self.width + 2 * offset_etchmask,
-                self.horizontal_bus_height + 2 * offset_etchmask))
-  
+                MyBox(
+                    self.start_pos.offset(-offset_etchmask, -offset_etchmask),
+                    self.width + 2 * offset_etchmask,
+                    self.horizontal_bus_height + 2 * offset_etchmask,
+                )
+            )
+
             self.top.shapes(self.layer_etch).insert(
                 MyBox(
-                self.start_pos.offset_x(
-                    self.width / 2 - self.vertical_bus_width / 2
-                ).offset(-offset_etchmask, -offset_etchmask),
-                self.vertical_bus_width + 2 * offset_etchmask,
-                self.height + 2 * offset_etchmask))
-
+                    self.start_pos.offset_x(
+                        self.width / 2 - self.vertical_bus_width / 2
+                    ).offset(-offset_etchmask, -offset_etchmask),
+                    self.vertical_bus_width + 2 * offset_etchmask,
+                    self.height + 2 * offset_etchmask,
+                )
+            )
 
         else:
             offset_etchmask = 0
@@ -115,7 +117,7 @@ class Hand:
                 MyBox(
                     self.start_pos.offset(-offset_etchmask, -offset_etchmask),
                     self.width + 2 * offset_etchmask,
-                    self.horizontal_bus_height + 2 * offset_etchmask
+                    self.horizontal_bus_height + 2 * offset_etchmask,
                 )
             )
             self.top.shapes(self.layer).insert(
@@ -124,7 +126,7 @@ class Hand:
                         self.width / 2 - self.vertical_bus_width / 2
                     ).offset(-offset_etchmask, -offset_etchmask),
                     self.vertical_bus_width + 2 * offset_etchmask,
-                    self.height + 2 * offset_etchmask
+                    self.height + 2 * offset_etchmask,
                 )
             )
 
@@ -154,15 +156,15 @@ class Hand:
                 self.finger_width + 2 * offset_etchmask,
             )
             if etchmask:
-              finger.draw(self.top, self.layer_etch)
+                finger.draw(self.top, self.layer_etch)
             else:
-              finger.draw(self.top, self.layer)
+                finger.draw(self.top, self.layer)
 
     def draw(self):
         """Method that draws the entire LED hand"""
         self.draw_base()
         self.draw_fingers()
-        #self.draw_enclosing_box()
+        # self.draw_enclosing_box()
         self.draw_Info()
 
     def draw_etch_mask(self):
@@ -201,22 +203,35 @@ class Hand:
         self.top.shapes(self.layer_box).insert(
             MyBox(
                 self.start_pos.offset(
-                    -self.enclosing_box_fraction / 2 * self.width ,
-                    -self.enclosing_box_fraction / 2 * self.height ,
+                    -self.enclosing_box_fraction / 2 * self.width,
+                    -self.enclosing_box_fraction / 2 * self.height,
                 ),
-                self.width * (1 + self.enclosing_box_fraction)  ,
+                self.width * (1 + self.enclosing_box_fraction),
                 self.height * (1 + self.enclosing_box_fraction),
             )
         )
-    
-    def draw_box_for_HF_mask(self, indent = 5):
+
+    def draw_box_for_HF_mask(self, indent=5):
         offset = indent * self.scale
         self.top.shapes(self.layer_etch).insert(
-                MyBox(
-                    self.start_pos.offset( offset, offset),
-                    self.width - 2 * offset,
-                    self.horizontal_bus_height - 2 * offset
-                ))
+            MyBox(
+                self.start_pos.offset(offset, offset),
+                self.width - 2 * offset,
+                self.horizontal_bus_height - 2 * offset,
+            )
+        )
+
+    def draw_box_for_metalization_mask(self, lenght=800):
+
+        self.top.shapes(self.layer_etch).insert(
+            MyBox(
+                self.start_pos.offset_y(
+                    self.horizontal_bus_height - lenght * self.scale
+                ),
+                self.width,
+                lenght * self.scale,
+            )
+        )
 
 
 def draw_grid(layout, top):
@@ -346,7 +361,6 @@ def draw_grid_etch_mask(layout, top):
                 top,
                 layer,
                 layer_box,
-                
                 enclosing_box_fraction,
                 hand_point,
                 finger_width,
@@ -354,7 +368,7 @@ def draw_grid_etch_mask(layout, top):
                 LED_widht,
                 LED_heigth,
                 scale,
-                layer_etch = layer_etch
+                layer_etch=layer_etch,
             )
 
             single_hand.draw_etch_mask()
@@ -362,7 +376,7 @@ def draw_grid_etch_mask(layout, top):
 
 def draw_mesa_etch(layout, top):
 
-   # top = layout.create_cell("TOP")
+    # top = layout.create_cell("TOP")
     layer_box = layout.layer(2, 0)
     layer_etch = layout.layer(2, 0)
     layer = layout.layer(2, 0)
@@ -396,7 +410,6 @@ def draw_mesa_etch(layout, top):
                 top,
                 layer,
                 layer_box,
-                
                 enclosing_box_fraction,
                 hand_point,
                 finger_width,
@@ -404,13 +417,13 @@ def draw_mesa_etch(layout, top):
                 LED_widht,
                 LED_heigth,
                 scale,
-                layer_etch = layer_etch
+                layer_etch=layer_etch,
             )
 
             single_hand.draw_enclosing_box()
             single_hand.draw_Info(etchmask=True)
-            
-          
+
+
 def draw_hf_etch(layout, top):
     layer_box = layout.layer(2, 0)
     layer_etch = layout.layer(2, 0)
@@ -445,7 +458,6 @@ def draw_hf_etch(layout, top):
                 top,
                 layer,
                 layer_box,
-                
                 enclosing_box_fraction,
                 hand_point,
                 finger_width,
@@ -453,11 +465,58 @@ def draw_hf_etch(layout, top):
                 LED_widht,
                 LED_heigth,
                 scale,
-                layer_etch = layer_etch
+                layer_etch=layer_etch,
             )
-            
+
             single_hand.draw_box_for_HF_mask()
-            
+
+
+def draw_metallizaiton_mask(layout, top):
+    layer_box = layout.layer(2, 0)
+    layer_etch = layout.layer(2, 0)
+    layer = layout.layer(2, 0)
+
+    scale = 1000
+
+    LED_widht = 1000 * scale  # microns
+    LED_heigth = 1000 * scale  # microns
+
+    LED_spacing_x = 1600 * scale  # microns
+    LED_spacing_y = 1600 * scale  # microns
+
+    finger_widths = np.array([4, 4.5, 5, 5.5]) * scale  # microns
+    finger_pitches = np.array([50, 100, 150, 230]) * scale  # microns
+
+    startpos = Point(0, 0)
+
+    enclosing_box_fraction = 0.012
+
+    for x in range(4):
+        for y in range(4):
+
+            hand_point = startpos.offset(
+                x * (LED_widht + LED_spacing_x), y * (LED_heigth + LED_spacing_y)
+            )
+
+            finger_width = finger_widths[y]
+            finger_pitch = finger_pitches[x]
+
+            single_hand = Hand(
+                top,
+                layer,
+                layer_box,
+                enclosing_box_fraction,
+                hand_point,
+                finger_width,
+                finger_pitch,
+                LED_widht,
+                LED_heigth,
+                scale,
+                layer_etch=layer_etch,
+            )
+
+            single_hand.draw_box_for_metalization_mask()
+
 
 if __name__ == "__main__":
 
@@ -466,5 +525,5 @@ if __name__ == "__main__":
     draw_hf_etch(layout, top)
     draw_grid(layout, top)
     layout.write(
-        "/Users/anders/Documents/Skole/5.host/Lab/FordypningLab/E2_2022_LED_HF_etch.gds"
+        "/Users/anders/Documents/Skole/5.host/Lab/FordypningLab/E2_2022_LED_Metalization.gds"
     )
